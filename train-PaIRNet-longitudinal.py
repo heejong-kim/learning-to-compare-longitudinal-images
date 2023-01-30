@@ -23,7 +23,6 @@ trainer
 
 def train(network, loader, opt, selfsupervised=True):
 
-
     print(opt)
     cuda = True
     parallel = True
@@ -359,7 +358,7 @@ parser.add_argument('--image_channel', default=1, type=int)
 parser.add_argument('--imagedir', default='./datasets/starmen-augmentation', type=str)
 parser.add_argument('--targetname', default='timepoint', type=str)
 parser.add_argument('--dataname', default='starmen', type=str)
-parser.add_argument('--selfsupervised', default=True, type=bool)
+parser.add_argument('--selfsupervised', action=argparse.BooleanOptionalAction)
 
 opt = parser.parse_args()
 set_manual_seed(opt.seed)
