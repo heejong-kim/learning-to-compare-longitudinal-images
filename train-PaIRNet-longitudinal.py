@@ -341,21 +341,23 @@ def test(network, loader, savedmodelname, opt, overwrite=False):
     return result
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--epoch', default=0, type=int, help="Starting epoch")
-parser.add_argument('--num_workers', default=12, type=int)
+
+
 parser.add_argument('--lr', default=0.001, type=float)
 parser.add_argument('--b1', default=0.9, type=float)
 parser.add_argument('--b2', default=0.999, type=float)
+parser.add_argument('--initialization', default='kaiming', type=str)
+parser.add_argument('--seed', default=0, type=int)
+
 parser.add_argument('--max_epoch', default=200, type=int, help="Max epoch")
-# TODO n_epoch to max_epoch
 parser.add_argument('--max_iters', default=10000000000, type=int, help="Max iteration")
-# TODO max_iters to max_iters
+parser.add_argument('--epoch', default=0, type=int, help="Starting epoch")
+parser.add_argument('--num_workers', default=12, type=int)
+
 parser.add_argument('--imagesize', default=[68, 68], type=list, help="image size [x, y]")
 parser.add_argument('--image_channel', default=1, type=int)
 parser.add_argument('--imagedir', default='./datasets/starmen-augmentation', type=str)
-parser.add_argument('--initialization', default='kaiming', type=str)
 parser.add_argument('--targetname', default='timepoint', type=str)
-parser.add_argument('--seed', default=0, type=int)
 parser.add_argument('--dataname', default='starmen', type=str)
 parser.add_argument('--selfsupervised', default=True, type=bool)
 
@@ -370,10 +372,10 @@ if __name__ == "__main__":
 
     # train PaIRNet
     if opt.selfsupervised:
-        opt.save_name = f'{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
+        opt.save_name = f'result/{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
                         f'PaIRNet-self-supervised'
     else:
-        opt.save_name = f'{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
+        opt.save_name = f'result/{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
                         f'PaIRNet-supervised'
 
     network = Resnet18Diff(channels=opt.image_channel)
@@ -384,3 +386,6 @@ if __name__ == "__main__":
     # savedmodelname = os.path.join('saved_models/' + opt.save_name, 'best.pth')
     # result = test(network, dict_dataloader[opt.dataname], savedmodelname, opt, overwrite=False)
     #
+
+
+
