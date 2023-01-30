@@ -353,13 +353,12 @@ parser.add_argument('--max_iters', default=10000000000, type=int, help="Max iter
 parser.add_argument('--epoch', default=0, type=int, help="Starting epoch")
 parser.add_argument('--num_workers', default=12, type=int)
 
-parser.add_argument('--imagesize', nargs='+', type=int, help="--imagesize x y ", required=True)
-parser.add_argument('--image_channel', default=1, type=int)
+parser.add_argument('--imagesize', nargs='+', help="--imagesize x y ", required=True)
+parser.add_argument('--imagechannel', default=1, type=int)
 parser.add_argument('--imagedir', default='./datasets/starmen-augmentation', type=str)
 parser.add_argument('--targetname', default='timepoint', type=str)
 parser.add_argument('--dataname', default='starmen', type=str)
 parser.add_argument('--selfsupervised', action=argparse.BooleanOptionalAction)
-
 
 
 opt = parser.parse_args()
@@ -380,7 +379,7 @@ if __name__ == "__main__":
         opt.save_name = f'result/{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
                         f'PaIRNet-supervised'
 
-    network = Resnet18Diff(channels=opt.image_channel)
+    network = Resnet18Diff(channels=opt.imagechannel)
     train(network, dict_dataloader[opt.dataname], opt, selfsupervised=opt.selfsupervised)
 
     #
