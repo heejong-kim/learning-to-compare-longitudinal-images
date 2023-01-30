@@ -371,7 +371,6 @@ opt.image_size = image_size
 dict_dataloader = {'starmen': STARMEN, 'tumor': TUMOR,
                    'embryo': EMBRYO, 'oasis': OASIS}
 
-print(opt)
 if __name__ == "__main__":
 
     # train PaIRNet
@@ -394,5 +393,4 @@ if __name__ == "__main__":
 
 
 
- python ./train-PaIRNet-longitudinal.py --max_epoch=1 --num_workers=1 --image_size="68,68" --image_channel=1 \
---image_dir='/scratch/datasets/hk672/starmen-augmentation' --dataname='starmen' --selfsupervised
+# python ./train-PaIRNet-longitudinal.py --max_epoch=1 --num_workers=1 --image_size="68,68" --image_channel=1 --image_dir='/scratch/datasets/hk672/starmen-augmentation' --dataname='starmen' --selfsupervised
