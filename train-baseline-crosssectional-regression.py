@@ -19,8 +19,6 @@ import datetime
 
 def train(network, loader, opt):
     print(opt)
-
-    # feature mnist 10 feature vectors
     cuda = True
     parallel = True
     device = torch.device(f"cuda:0" if torch.cuda.is_available() else "cpu")
@@ -29,8 +27,6 @@ def train(network, loader, opt):
     if 'initialization' in opt:
         if 'features' in dir(network):
             init_weights(network.features, type=opt.initialization)
-        if 'comparison' in dir(network):
-            init_weights(network.comparison, type=opt.initialization)
         if 'classifier' in dir(network):
             init_weights(network.classifier, type=opt.initialization)
         if 'fc' in dir(network):
@@ -38,19 +34,18 @@ def train(network, loader, opt):
 
         print(f'Initialized: {opt.initialization}')
 
-
-    os.makedirs("saved_models/%s/" % (opt.save_name), exist_ok=True)
+    os.makedirs("%s/" % (opt.save_name), exist_ok=True)
     if parallel:
         network = nn.DataParallel(network).to(device)
 
     if opt.epoch > 0 :
-        if len(glob.glob("saved_models/%s/epoch%i*.pth" % (opt.save_name, opt.epoch - 1)))>0:
-            lastpointname = glob.glob("saved_models/%s/epoch%i*.pth" % (opt.save_name, opt.epoch-1))[0]
+        if len(glob.glob("%s/epoch%i*.pth" % (opt.save_name, opt.epoch - 1)))>0:
+            lastpointname = glob.glob("%s/epoch%i*.pth" % (opt.save_name, opt.epoch-1))[0]
             network.load_state_dict(torch.load(lastpointname))
             total_iter = int(lastpointname.split(".pth")[0].split('iter')[-1])
         else:
-            bestepoch, bestiter = np.loadtxt(os.path.join('saved_models/' + opt.save_name, 'best.info'))
-            bestpointname = glob.glob("saved_models/%s/best.pth" % (opt.save_name))[0]
+            bestepoch, bestiter = np.loadtxt(os.path.join( opt.save_name, 'best.info'))
+            bestpointname = glob.glob("%s/best.pth" % (opt.save_name))[0]
             network.load_state_dict(torch.load(bestpointname))
             opt.epoch = int(bestepoch)
             total_iter = bestiter
@@ -69,28 +64,27 @@ def train(network, loader, opt):
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=5)  # factor 0.1
 
     steps_per_epoch = opt.max_iters  # 781
-    writer = SummaryWriter(log_dir="saved_models/%s" % opt.save_name)
+    writer = SummaryWriter(log_dir="%s" % opt.save_name)
 
     prev_time = time.time()
     prev_val_loss = 400
     earlystoppingcount = 0
 
-
     loader_train = torch.utils.data.DataLoader(  #
-        loader(root=opt.imagedir, trainvaltest='train', transform=True, opt=opt),
+        loader(root=opt.image_dir, trainvaltest='train', transform=True, opt=opt),
         batch_size=64, shuffle=True, num_workers=opt.num_workers, drop_last=True)
 
     loader_val = torch.utils.data.DataLoader(
-        loader(root=opt.imagedir, trainvaltest='val', transform=False, opt=opt),
+        loader(root=opt.image_dir, trainvaltest='val', transform=False, opt=opt),
         batch_size=64, shuffle=True, num_workers=opt.num_workers, drop_last=True)
 
     for epoch in range(opt.epoch, opt.max_epoch):
 
         if epoch == int(opt.max_epoch / 4):
             torch.save(network.state_dict(),
-                       "saved_models/%s/epoch%d-iter%d.pth" % (opt.save_name, epoch, total_iter))
+                       "%s/epoch%d-iter%d.pth" % (opt.save_name, epoch, total_iter))
 
-        if total_iter > opt.maxiter:
+        if total_iter > opt.max_iters:
             break
 
         if earlystoppingcount > 5:
@@ -105,9 +99,6 @@ def train(network, loader, opt):
 
             input1, target1 = batch
 
-            # ------------------
-            #  Train Generators
-            # ------------------
             optimizer.zero_grad()
 
             # Feature Network
@@ -120,18 +111,14 @@ def train(network, loader, opt):
 
             epoch_total_loss.append(loss.item())
 
-            # --------------
-            #  Log Progress
-            # --------------
+
             # Determine approximate time left
             batches_done = epoch * len(loader_train) + step
             batches_left = opt.max_epoch * len(loader_train) - batches_done
             time_left = datetime.timedelta(seconds=batches_left * (time.time() - prev_time))
             prev_time = time.time()
-
-            # Print log
             sys.stdout.write(
-                "\r[Epoch %d/%d] [Batch %d/%d] [ loss: %f ] ETA: %s"  # [ target diff: %d ]
+                "\r[Epoch %d/%d] [Batch %d/%d] [ loss: %f ] ETA: %s"
                 % (
                     epoch,
                     opt.max_epoch,
@@ -156,7 +143,6 @@ def train(network, loader, opt):
                 valloss_total = [];
                 for valstep, batch in enumerate(loader_val):
                     input1, target1 = batch
-                    # Feature Network
                     pred = network(input1.type(Tensor))
                     target = target1[:, None].type(Tensor)
                     valloss = loss_mse(pred, target)
@@ -170,19 +156,18 @@ def train(network, loader, opt):
                 curr_val_loss = np.mean(valloss_total)
                 if 'scheduler' in opt:
                     scheduler.step(curr_val_loss)
-
                 if prev_val_loss > curr_val_loss:
                     torch.save(network.state_dict(),
-                               "saved_models/%s/best.pth" % (opt.save_name))
+                               "%s/best.pth" % (opt.save_name))
 
-                    np.savetxt("saved_models/%s/best.info" % (opt.save_name), np.array([epoch, total_iter]))
+                    np.savetxt("%s/best.info" % (opt.save_name), np.array([epoch, total_iter]))
                     prev_val_loss = curr_val_loss
                     earlystoppingcount = 0  # New bottom
                 else:
                     earlystoppingcount += 1
                     print(f'Early stopping count: {earlystoppingcount}')
 
-    torch.save(network.state_dict(), "saved_models/%s/epoch%d-iter%d.pth" % (opt.save_name, epoch, total_iter))
+    torch.save(network.state_dict(), "%s/epoch%d-iter%d.pth" % (opt.save_name, epoch, total_iter))
     network.eval()
 
 def test_regression(network, loader, savedmodelname, opt, overwrite=False):
@@ -190,8 +175,10 @@ def test_regression(network, loader, savedmodelname, opt, overwrite=False):
 
     print('working on ', resultname)
     run = False
-    resultfilenmae = os.path.join('saved_models/' + opt.save_name, f'{resultname}.csv')
+    resultfilenmae = os.path.join( opt.save_name, f'{resultname}.csv')
     if os.path.exists(resultfilenmae):
+        print(f'{resultname} EXISTS')
+        print(f'....result loaded from the exisintg file')
         result = pd.read_csv(resultfilenmae)
 
     if not os.path.exists(resultfilenmae) or overwrite:
@@ -214,7 +201,7 @@ def test_regression(network, loader, savedmodelname, opt, overwrite=False):
         network.eval()
 
         loader_test = torch.utils.data.DataLoader(
-            loader(root=opt.imagedir, trainvaltest='test', transform=False, opt=opt),
+            loader(root=opt.image_dir, trainvaltest='test', transform=False, opt=opt),
             batch_size=64, shuffle=True, num_workers=opt.num_workers)
 
         tmp_stack_output = np.empty((0, 1))
@@ -243,30 +230,31 @@ def test_regression(network, loader, savedmodelname, opt, overwrite=False):
 
     return result
 
-
-
 parser = argparse.ArgumentParser()
-parser.add_argument('--epoch', default=0, type=int, help="Starting epoch")
-parser.add_argument('--num_workers', default=12, type=int)
 parser.add_argument('--lr', default=0.001, type=float)
 parser.add_argument('--b1', default=0.9, type=float)
 parser.add_argument('--b2', default=0.999, type=float)
-parser.add_argument('--max_epoch', default=200, type=int, help="Max epoch")
-# TODO n_epoch to max_epoch
-parser.add_argument('--max_iters', default=10000000000, type=int, help="Max iteration")
-# TODO max_iters to max_iters
-parser.add_argument('--imagesize', default=[68, 68], type=list, help="image size [x, y]")
-parser.add_argument('--imagechannel', default=1, type=int)
-parser.add_argument('--imagedir', default='./datasets/starmen-augmentation', type=str)
 parser.add_argument('--initialization', default='kaiming', type=str)
-parser.add_argument('--targetname', default='timepoint', type=str)
 parser.add_argument('--seed', default=0, type=int)
+
+parser.add_argument('--max_epoch', default=200, type=int, help="Max epoch")
+parser.add_argument('--max_iters', default=10000000000, type=int, help="Max iteration")
+parser.add_argument('--epoch', default=0, type=int, help="Starting epoch")
+parser.add_argument('--num_workers', default=12, type=int)
+
+parser.add_argument('--image_size', default="68,68", type=str, help="x,y", required=True)
+parser.add_argument('--image_channel', default=1, type=int)
+parser.add_argument('--image_dir', default='./datasets/starmen-augmentation', type=str)
+parser.add_argument('--targetname', default='tstar', type=str)
 parser.add_argument('--dataname', default='starmen', type=str)
-parser.add_argument('--selfsupervised', default=True, type=bool)
+
 
 opt = parser.parse_args()
 set_manual_seed(opt.seed)
 suffix = f'seed{torch.initial_seed()}'
+
+image_size = [int(item) for item in opt.image_size.split(',')]
+opt.image_size = image_size
 
 dict_dataloader = {'starmen': STARMENregression, 'tumor': TUMORregression,
                    'embryo': EMBRYOregression, 'oasis': OASISregression}
@@ -274,7 +262,7 @@ dict_dataloader = {'starmen': STARMENregression, 'tumor': TUMORregression,
 if __name__ == "__main__":
 
     # train baseline regression assuming cross-crosssectional data
-    opt.save_name = f'{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
+    opt.save_name = f'result/{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
                         f'PaIRNet-self-supervised'
 
     network = Resnet18Regression(channels=opt.imagechannel)
@@ -282,6 +270,10 @@ if __name__ == "__main__":
 
     #
     # # test the trained model with the best weight
-    # savedmodelname = os.path.join('saved_models/' + opt.save_name, 'best.pth')
+    # savedmodelname = os.path.join(opt.save_name, 'best.pth')
     # result = test_regression(network, dict_dataloader[opt.dataname], savedmodelname, opt, overwrite=False)
     #
+
+
+# python ./train-baseline-crosssectional-regression.py --max_epoch=1 --num_workers=1 --image_size="68,68" --image_channel=1 \
+# --image_dir='/scratch/datasets/hk672/starmen-augmentation' --dataname='starmen' --selfsupervised --targetname='tstar'
