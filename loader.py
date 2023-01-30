@@ -34,7 +34,7 @@ class STARMEN(Dataset):
         if opt == None:
             img_height, img_width = [200, 200]
         else:
-            img_height, img_width = opt.imagesize
+            img_height, img_width = opt.image_size
             self.targetname = opt.targetname
 
         self.resize = transforms.Compose([
@@ -87,7 +87,7 @@ class STARMENregression(Dataset):
         if opt == None:
             img_height, img_width = [200, 200]
         else:
-            img_height, img_width = opt.imagesize
+            img_height, img_width = opt.image_size
             self.targetname = opt.targetname
 
         self.resize = transforms.Compose([
@@ -139,7 +139,7 @@ class TUMOR(Dataset):
         if opt == None:
             img_height, img_width = [200, 200]
         else:
-            img_height, img_width = opt.imagesize
+            img_height, img_width = opt.image_size
 
         self.resize = transforms.Compose([
             transforms.Resize((img_height, img_width), Image.BICUBIC),
@@ -187,7 +187,7 @@ class TUMORregression(Dataset):
         if opt == None:
             img_height, img_width = [200, 200]
         else:
-            img_height, img_width = opt.imagesize
+            img_height, img_width = opt.image_size
 
         self.resize = transforms.Compose([
             transforms.Resize((img_height, img_width), Image.BICUBIC),
@@ -242,7 +242,7 @@ class OASIS(Dataset):
         if opt == None:
             img_height, img_width = [176, 256]
         else:
-            img_height, img_width = opt.imagesize
+            img_height, img_width = opt.image_size
 
         self.resize = transforms.Compose([
             transforms.Resize((img_height, img_width), Image.BICUBIC),
@@ -295,7 +295,7 @@ class OASISregression(Dataset):
         if opt == None:
             img_height, img_width = [176, 256]
         else:
-            img_height, img_width = opt.imagesize
+            img_height, img_width = opt.image_size
 
         self.resize = transforms.Compose([
             transforms.Resize((img_height, img_width), Image.BICUBIC),
@@ -352,7 +352,7 @@ class EMBRYO(Dataset):
             img_height, img_width = [500, 500]
             self.targetname = 'phaseidx'
         else:
-            img_height, img_width = opt.imagesize
+            img_height, img_width = opt.image_size
             self.targetname = opt.targetname
 
         self.resize = transforms.Compose([
@@ -402,7 +402,7 @@ class EMBRYOregression(Dataset):
             img_height, img_width = [500, 500]
             self.targetname = 'phaseidx'
         else:
-            img_height, img_width = opt.imagesize
+            img_height, img_width = opt.image_size
             self.targetname = opt.targetname
 
 
