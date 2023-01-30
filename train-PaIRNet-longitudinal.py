@@ -76,11 +76,11 @@ def train(network, loader, opt, selfsupervised=True):
     earlystoppingcount = 0
 
     loader_train = torch.utils.data.DataLoader(  #
-        loader(root=opt.imagedir, trainvaltest='train', transform=True, opt=opt),
+        loader(root=opt.image_dir, trainvaltest='train', transform=True, opt=opt),
         batch_size=64, shuffle=True, num_workers=opt.num_workers, drop_last=True)
 
     loader_val = torch.utils.data.DataLoader(
-        loader(root=opt.imagedir, trainvaltest='val', transform=False, opt=opt),
+        loader(root=opt.image_dir, trainvaltest='val', transform=False, opt=opt),
         batch_size=64, shuffle=True, num_workers=opt.num_workers, drop_last=True)
 
     for epoch in range(opt.epoch, opt.max_epoch):
@@ -89,7 +89,7 @@ def train(network, loader, opt, selfsupervised=True):
             torch.save(network.state_dict(),
                        "saved_models/%s/epoch%d-iter%d.pth" % (opt.save_name, epoch, total_iter))
 
-        if total_iter > opt.maxiter:
+        if total_iter > opt.max_iters:
             break
 
         if earlystoppingcount > 5:
@@ -230,7 +230,7 @@ def test(network, loader, savedmodelname, opt, overwrite=False):
         network.eval()
 
         loader_test = torch.utils.data.DataLoader(
-            loader(root=opt.imagedir, trainvaltest='test', transform=False, opt=opt),
+            loader(root=opt.image_dir, trainvaltest='test', transform=False, opt=opt),
             batch_size=64, shuffle=True, num_workers=opt.num_workers)
 
         stack_acc = []
@@ -353,9 +353,9 @@ parser.add_argument('--max_iters', default=10000000000, type=int, help="Max iter
 parser.add_argument('--epoch', default=0, type=int, help="Starting epoch")
 parser.add_argument('--num_workers', default=12, type=int)
 
-parser.add_argument('--imagesize', default="68,68", type=str, help="x,y", required=True)
-parser.add_argument('--imagechannel', default=1, type=int)
-parser.add_argument('--imagedir', default='./datasets/starmen-augmentation', type=str)
+parser.add_argument('--image_size', default="68,68", type=str, help="x,y", required=True)
+parser.add_argument('--image_channel', default=1, type=int)
+parser.add_argument('--image_dir', default='./datasets/starmen-augmentation', type=str)
 parser.add_argument('--targetname', default='timepoint', type=str)
 parser.add_argument('--dataname', default='starmen', type=str)
 parser.add_argument('--selfsupervised', action=argparse.BooleanOptionalAction)
@@ -365,8 +365,8 @@ opt = parser.parse_args()
 set_manual_seed(opt.seed)
 suffix = f'seed{torch.initial_seed()}'
 
-imagesize = [int(item) for item in opt.imagesize.split(',')]
-opt.imagesize = imagesize
+image_size = [int(item) for item in opt.image_size.split(',')]
+opt.image_size = image_size
 
 dict_dataloader = {'starmen': STARMEN, 'tumor': TUMOR,
                    'embryo': EMBRYO, 'oasis': OASIS}
@@ -382,7 +382,7 @@ if __name__ == "__main__":
         opt.save_name = f'result/{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
                         f'PaIRNet-supervised'
 
-    network = Resnet18Diff(channels=opt.imagechannel)
+    network = Resnet18Diff(channels=opt.image_channel)
     train(network, dict_dataloader[opt.dataname], opt, selfsupervised=opt.selfsupervised)
 
     #
@@ -393,3 +393,6 @@ if __name__ == "__main__":
 
 
 
+
+ python ./train-PaIRNet-longitudinal.py --max_epoch=1 --num_workers=1 --image_size="68,68" --image_channel=1 \
+--image_dir='/scratch/datasets/hk672/starmen-augmentation' --dataname='starmen' --selfsupervised
