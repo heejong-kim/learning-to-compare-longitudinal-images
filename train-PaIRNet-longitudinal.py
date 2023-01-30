@@ -353,7 +353,7 @@ parser.add_argument('--max_iters', default=10000000000, type=int, help="Max iter
 parser.add_argument('--epoch', default=0, type=int, help="Starting epoch")
 parser.add_argument('--num_workers', default=12, type=int)
 
-parser.add_argument('--imagesize', nargs='+', help="--imagesize x y ", required=True)
+parser.add_argument('--imagesize', default="68,68", type=str, help="x,y", required=True)
 parser.add_argument('--imagechannel', default=1, type=int)
 parser.add_argument('--imagedir', default='./datasets/starmen-augmentation', type=str)
 parser.add_argument('--targetname', default='timepoint', type=str)
@@ -364,6 +364,9 @@ parser.add_argument('--selfsupervised', action=argparse.BooleanOptionalAction)
 opt = parser.parse_args()
 set_manual_seed(opt.seed)
 suffix = f'seed{torch.initial_seed()}'
+
+imagesize = [int(item) for item in opt.imagesize.split(',')]
+opt.imagesize = imagesize
 
 dict_dataloader = {'starmen': STARMEN, 'tumor': TUMOR,
                    'embryo': EMBRYO, 'oasis': OASIS}
