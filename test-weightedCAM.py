@@ -46,7 +46,7 @@ def get_cam_image(weighted_activations, input):
                                   scaled.squeeze(), use_rgb=True)
     return cam_image, inputvis
 
-def load_pair_model(visnetwork):
+def load_pair_model(visnetwork, savedmodelname):
 
     # load weight from original network
     tmpweight = torch.load(savedmodelname)
@@ -101,8 +101,6 @@ def _visualize_all_pair(model, vissavedir, loader_test, subjidname):
     pairindices = loader_test.dataset.index_combination.astype('int')
     count = 0
     subjectN = len(unqid)
-    # if subjectN > 150:
-    #     unqid = unqid[:150]
 
     for uid in unqid:
         count += 1
@@ -167,8 +165,6 @@ def _visualize_t0_pair(model, vissavedir, loader_test, subjidname):
     pairindices = loader_test.dataset.index_combination.astype('int')
     count = 0
     subjectN = len(unqid)
-    # if subjectN > 150:
-    #     unqid = unqid[:150]
 
     for uid in unqid:
         count += 1
@@ -197,7 +193,6 @@ def _visualize_t0_pair(model, vissavedir, loader_test, subjidname):
                 feature_weight = (f1 - f2).cpu().detach().numpy()
                 linear_weight = model.module.classifier[0].weight.cpu().detach().numpy()
                 total_weight = np.abs(feature_weight*linear_weight).squeeze()
-                total_weight_sign = (feature_weight*linear_weight).squeeze()
 
                 _, activation1 = get_featurewise_gradcam(input1, model, 0)
                 _, activation2 = get_featurewise_gradcam(input2, model, 0)
@@ -213,8 +208,6 @@ def _visualize_t0_pair(model, vissavedir, loader_test, subjidname):
                     inputvis1 = np.repeat(inputvis1, 3, 2)
                     inputvis2 = np.repeat(inputvis2, 3, 2)
 
-                alpha = 0.7
-                import matplotlib.colors as mcolors
 
                 model.module.release()
                 output = np.sum(feature_weight * linear_weight)

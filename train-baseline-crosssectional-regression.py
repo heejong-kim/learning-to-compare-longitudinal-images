@@ -246,7 +246,7 @@ parser.add_argument('--num_workers', default=12, type=int)
 parser.add_argument('--image_size', default="68,68", type=str, help="x,y")
 parser.add_argument('--image_channel', default=1, type=int)
 parser.add_argument('--image_dir', default='./datasets/starmen-augmentation', type=str)
-parser.add_argument('--targetname', default='tstar', type=str)
+parser.add_argument('--targetname', default='t_star', type=str)
 parser.add_argument('--dataname', default='starmen', type=str)
 
 
