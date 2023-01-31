@@ -352,6 +352,12 @@ parser.add_argument('--targetname', default='timepoint', type=str)
 parser.add_argument('--dataname', default='starmen', type=str)
 parser.add_argument('--selfsupervised', action=argparse.BooleanOptionalAction)
 
+parser.add_argument('--image_size', default="200,200", type=str, help="x,y", required=True)
+parser.add_argument('--image_channel', default=3, type=int)
+parser.add_argument('--image_dir', default='./data/tumor', type=str)
+parser.add_argument('--targetname', default='timepoint', type=str)
+parser.add_argument('--dataname', default='tumor', type=str)
+parser.add_argument('--selfsupervised', action=argparse.BooleanOptionalAction)
 
 opt = parser.parse_args()
 set_manual_seed(opt.seed)
