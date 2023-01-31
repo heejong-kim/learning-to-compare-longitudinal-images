@@ -52,10 +52,10 @@ def correlation_test(result_delta_time_corr, figure=True, figurename=''):
 
     return r, p
 
-def test_PaIRNet(network, loader, savedmodelname, opt, gt_target, subjidname, resultname, overwrite=False):
-    print('working on ', resultname)
+def test_PaIRNet(network, loader, savedmodelname, opt, gt_target, subjidname, overwrite=False):
+    print('working on ', savedmodelname)
     run = False
-    resultfilename = os.path.join(opt.save_name, f'{resultname}.csv')
+    resultfilename = os.path.join(opt.save_name.split('.pth')[0] + f'-test-prediction.csv')
     if not os.path.exists(resultfilename) or overwrite:
         run = True
     else:
@@ -130,10 +130,10 @@ def test_PaIRNet(network, loader, savedmodelname, opt, gt_target, subjidname, re
 
     return result, loader_test.dataset.demo
 
-def test_crosssectional_regression(network, loader, savedmodelname, opt, resultname, overwrite=False):
-    print('working on ', resultname)
+def test_crosssectional_regression(network, loader, savedmodelname, opt, overwrite=False):
+    print(f'Working on {savedmodelname}')
     run = False
-    resultfilename = os.path.join('' + opt.save_name, f'{resultname}.csv')
+    resultfilename = os.path.join(opt.save_name.split('.pth')[0] + f'-test-prediction.csv')
     if not os.path.exists(resultfilename) or overwrite:
         run = True
     else:
@@ -214,7 +214,7 @@ if __name__ == "__main__":
     network = Resnet18Diff(channels=opt.image_channel)
     savedmodelname = os.path.join(opt.save_name)
     result_delta_time, demo = test_PaIRNet(network, dict_dataloader[opt.dataname], savedmodelname, opt, opt.targetname,
-                                                dict_subjectname[opt.dataname], resultname= 'test-prediction', overwrite=False)
+                                                dict_subjectname[opt.dataname], overwrite=False)
     if 'starmen' in opt.dataname:
         t_star = np.array(demo["alpha"] * (demo["t"] - demo["tau"]))
         t_star[np.array(result_delta_time.pairindex1).astype('int')] - t_star[np.array(result_delta_time.pairindex2).astype('int')]
