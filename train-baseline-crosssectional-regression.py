@@ -243,7 +243,7 @@ parser.add_argument('--num_of_iters', default=200, type=int, help="number of ite
 parser.add_argument('--epoch', default=0, type=int, help="Starting epoch")
 parser.add_argument('--num_workers', default=12, type=int)
 
-parser.add_argument('--image_size', default="68,68", type=str, help="x,y", required=True)
+parser.add_argument('--image_size', default="68,68", type=str, help="x,y")
 parser.add_argument('--image_channel', default=1, type=int)
 parser.add_argument('--image_dir', default='./datasets/starmen-augmentation', type=str)
 parser.add_argument('--targetname', default='tstar', type=str)
