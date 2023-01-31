@@ -266,7 +266,7 @@ if __name__ == "__main__":
                         f'PaIRNet-self-supervised'
 
     network = Resnet18Regression(channels=opt.imagechannel)
-    train(network, dict_dataloader[opt.dataname], opt, selfsupervised=opt.selfsupervised)
+    train(network, dict_dataloader[opt.dataname], opt)
 
     #
     # # test the trained model with the best weight
@@ -274,6 +274,3 @@ if __name__ == "__main__":
     # result = test_regression(network, dict_dataloader[opt.dataname], savedmodelname, opt, overwrite=False)
     #
 
-
-# python ./train-baseline-crosssectional-regression.py --max_epoch=1 --num_workers=1 --image_size="68,68" --image_channel=1 \
-# --image_dir='/scratch/datasets/hk672/starmen-augmentation' --dataname='starmen' --selfsupervised --targetname='tstar'

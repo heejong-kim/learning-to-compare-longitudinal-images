@@ -333,7 +333,7 @@ def test(network, loader, savedmodelname, opt, overwrite=False):
     return result
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--lr', default=0.001, type=float)
+parser.add_argument('--lr', default=0.01, type=float)
 parser.add_argument('--b1', default=0.9, type=float)
 parser.add_argument('--b2', default=0.999, type=float)
 parser.add_argument('--initialization', default='kaiming', type=str)
@@ -366,10 +366,10 @@ if __name__ == "__main__":
 
     # train PaIRNet
     if opt.selfsupervised:
-        opt.save_name = f'result/{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
+        opt.save_name = f'result-model/{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
                         f'PaIRNet-self-supervised'
     else:
-        opt.save_name = f'result/{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
+        opt.save_name = f'result-model/{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
                         f'PaIRNet-supervised'
 
     network = Resnet18Diff(channels=opt.image_channel)
@@ -384,4 +384,3 @@ if __name__ == "__main__":
 
 
 
-# python ./train-PaIRNet-longitudinal.py --max_epoch=1 --num_workers=1 --image_size="68,68" --image_channel=1 --image_dir='/scratch/datasets/hk672/starmen-augmentation' --dataname='starmen' --selfsupervised

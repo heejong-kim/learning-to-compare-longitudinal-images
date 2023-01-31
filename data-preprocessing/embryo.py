@@ -12,7 +12,7 @@ from torchvision.transforms.functional import InterpolationMode
 # TODO revisit and write guide for preprocessing
 
 import glob
-dir_annotation = './data/embryo/embryo_dataset_annotations'
+dir_annotation = '../data/embryo/embryo_dataset_annotations'
 embryolist = glob.glob(os.path.join(dir_annotation,'*.csv'))
 tmpdemo = pd.DataFrame()
 tmpdemo['annotationfiles'] = embryolist
