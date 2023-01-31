@@ -221,7 +221,7 @@ if __name__ == "__main__":
         result_delta_time['gt-target'] = t_star[np.array(result_delta_time.pairindex1).astype('int')] - t_star[np.array(result_delta_time.pairindex2).astype('int')]
         result_delta_time['gt-target-base'] = t_star[np.array(result_delta_time.pairindex1).astype('int')]
 
-    os.makedirs('./result-correlation')
+    os.makedirs('./result-correlation', exist_ok=True)
     r, p = correlation_test(result_delta_time, figure=True, figurename=f'./result-correlation/{opt.dataname}-{opt.targetname}.png')
 
 
