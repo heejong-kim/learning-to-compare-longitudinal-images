@@ -201,7 +201,7 @@ parser.add_argument('--image_size', default="68,68", type=str, help="x,y", requi
 parser.add_argument('--image_channel', default=1, type=int)
 parser.add_argument('--image_dir', default='./datasets/starmen-augmentation', type=str)
 parser.add_argument('--dataname', type=str, required=True)
-parser.add_argument('--save_name', type=str, required=True, help="directory of the model")
+parser.add_argument('--save_name', type=str, required=True, help="path to saved model (.pth)")
 parser.add_argument('--targetname', type=str, required=True, help="groundtruth target name (x axis)")
 
 opt = parser.parse_args()
@@ -212,22 +212,22 @@ opt.image_size = image_size
 if __name__ == "__main__":
 
     network = Resnet18Diff(channels=opt.n_channels)
-    savedmodelname = os.path.join(opt.save_name, 'best.pth')
+    savedmodelname = os.path.join(opt.save_name)
     result_delta_time, demo = test_PaIRNet(network, dict_dataloader[opt.dataname], savedmodelname, opt, opt.targetname,
                                                 dict_subjectname[opt.dataname], resultname= 'test-prediction', overwrite=False)
-    if 'starmen' in dataname:
+    if 'starmen' in opt.dataname:
         t_star = np.array(demo["alpha"] * (demo["t"] - demo["tau"]))
         t_star[np.array(result_delta_time.pairindex1).astype('int')] - t_star[np.array(result_delta_time.pairindex2).astype('int')]
         result_delta_time['gt-target'] = t_star[np.array(result_delta_time.pairindex1).astype('int')] - t_star[np.array(result_delta_time.pairindex2).astype('int')]
         result_delta_time['gt-target-base'] = t_star[np.array(result_delta_time.pairindex1).astype('int')]
 
-    r, p = correlation_test(result_delta_time, figure=True, figurename=f'./figure-correlation-{task}-{savename}.png')
+    r, p = correlation_test(result_delta_time, figure=True, figurename=f'./figure-correlation-{opt.dataname}-{opt.targetname}.png')
 
 
     ## --- for regression
     #
     # network = Resnet18Regression(channels=opt.n_channels)
-    # savedmodelname = os.path.join(opt.save_name, 'best.pth')
+    # savedmodelname = os.path.join(opt.save_name)
     # result_reg_pred, demo = test_crosssectional_regression(network, dict_dataloader[opt.dataname], savedmodelname, opt, overwrite=False)
     #
     # IDunq = np.unique(demo[dict_subjectname[opt.dataname]])

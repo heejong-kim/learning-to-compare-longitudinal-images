@@ -289,7 +289,7 @@ def visualize_PaIRNet(loader, opt, n_channels, subjidname, savename, overwrite =
         loader(root=opt.imagedir, trainvaltest='test', transform=False, opt=opt),
         batch_size=1, shuffle=False, num_workers=opt.num_workers)
 
-    savedmodelname = os.path.join(opt.save_name, 'best.pth')
+    savedmodelname = os.path.join(opt.save_name)
     tmpweight = torch.load(savedmodelname)
     visnetwork = Resnet18DiffForPairVisFeature(channels=n_channels)
 
@@ -321,7 +321,7 @@ def visualize_crosssectional_regression(loader, opt, n_channels, subjidname, sav
         loader(root=opt.imagedir, trainvaltest='test', transform=False, opt=opt),
         batch_size=1, shuffle=False, num_workers=opt.num_workers)
 
-    savedmodelname = os.path.join(opt.save_name, 'best.pth')
+    savedmodelname = os.path.join(opt.save_name)
     loadmodel = Resnet18RegressionForPairVisFeature(channels=n_channels)
     visnetwork = load_single_model(loadmodel, savedmodelname)
     visnetwork.eval()
@@ -345,7 +345,7 @@ parser.add_argument('--image_size', default="68,68", type=str, help="x,y", requi
 parser.add_argument('--image_channel', default=1, type=int)
 parser.add_argument('--image_dir', default='./datasets/starmen-augmentation', type=str)
 parser.add_argument('--dataname', type=str, required=True)
-parser.add_argument('--save_name', type=str, required=True)
+parser.add_argument('--save_name', type=str, required=True, help="path to saved model (.pth)")
 
 
 opt = parser.parse_args()

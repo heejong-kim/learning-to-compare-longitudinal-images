@@ -263,7 +263,7 @@ dict_dataloader = {'starmen': STARMENregression, 'tumor': TUMORregression,
 if __name__ == "__main__":
 
     # train baseline regression assuming cross-crosssectional data
-    opt.save_name = f'result/{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
+    opt.save_name = f'result-model/{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
                         f'PaIRNet-self-supervised'
 
     network = Resnet18Regression(channels=opt.image_channel)
