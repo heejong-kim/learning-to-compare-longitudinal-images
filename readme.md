@@ -10,7 +10,7 @@ Implementation of the paper "Learning to compare longitudinal images" of Heejong
 ## Dependencies 
 ```shell
 conda env create -f environment.yml
-conda activate smri2dwi
+conda activate pairnet
 ```
 
 
