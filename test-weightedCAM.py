@@ -339,6 +339,7 @@ parser.add_argument('--image_channel', default=1, type=int)
 parser.add_argument('--image_dir', default='./datasets/starmen-augmentation', type=str)
 parser.add_argument('--dataname', type=str, required=True)
 parser.add_argument('--save_name', type=str, required=True, help="path to saved model (.pth)")
+parser.add_argument('--targetname', default='timepoint', type=str)
 
 
 opt = parser.parse_args()

@@ -61,7 +61,7 @@ def test_PaIRNet(network, loader, savedmodelname, opt, gt_target, subjidname, re
     else:
         result = pd.read_csv(resultfilename)
         loader_test = torch.utils.data.DataLoader(
-            loader(root=opt.imagedir, trainvaltest='test', transform=False, opt=opt),
+            loader(root=opt.image_dir, trainvaltest='test', transform=False, opt=opt),
             batch_size=64, shuffle=False, num_workers=opt.num_workers)
 
     if run:
@@ -82,7 +82,7 @@ def test_PaIRNet(network, loader, savedmodelname, opt, gt_target, subjidname, re
         network.eval()
 
         loader_test = torch.utils.data.DataLoader(
-            loader(root=opt.imagedir, trainvaltest='test', transform=False, opt=opt),
+            loader(root=opt.image_dir, trainvaltest='test', transform=False, opt=opt),
             batch_size=64, shuffle=False, num_workers=opt.num_workers)
 
         targetdiffvalue = np.empty((0, 1))
@@ -139,7 +139,7 @@ def test_crosssectional_regression(network, loader, savedmodelname, opt, resultn
     else:
         result = pd.read_csv(resultfilename)
         loader_test = torch.utils.data.DataLoader(
-            loader(root=opt.imagedir, trainvaltest='test', transform=False, opt=opt),
+            loader(root=opt.image_dir, trainvaltest='test', transform=False, opt=opt),
             batch_size=64, shuffle=False, num_workers=opt.num_workers)
 
     if run:
@@ -160,7 +160,7 @@ def test_crosssectional_regression(network, loader, savedmodelname, opt, resultn
         network.eval()
 
         loader_test = torch.utils.data.DataLoader(
-            loader(root=opt.imagedir, trainvaltest='test', transform=False, opt=opt),
+            loader(root=opt.image_dir, trainvaltest='test', transform=False, opt=opt),
             batch_size=64, shuffle=False, num_workers=opt.num_workers)
 
         targetvalue = np.empty((0, 1))
