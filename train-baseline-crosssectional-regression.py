@@ -63,7 +63,7 @@ def train(network, loader, opt):
     if 'scheduler' in opt:
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=5)  # factor 0.1
 
-    steps_per_epoch = opt.max_iters  # 781
+    steps_per_epoch = opt.num_of_iters  # 781
     writer = SummaryWriter(log_dir="%s" % opt.save_name)
 
     prev_time = time.time()
@@ -239,6 +239,7 @@ parser.add_argument('--seed', default=0, type=int)
 
 parser.add_argument('--max_epoch', default=200, type=int, help="Max epoch")
 parser.add_argument('--max_iters', default=10000000000, type=int, help="Max iteration")
+parser.add_argument('--num_of_iters', default=200, type=int, help="number of iteration for validation")
 parser.add_argument('--epoch', default=0, type=int, help="Starting epoch")
 parser.add_argument('--num_workers', default=12, type=int)
 
