@@ -279,7 +279,7 @@ def _visualize_regression(model, vissavedir, loader_test, subjidname):
 
 def visualize_PaIRNet(loader, opt, n_channels, subjidname, savename, overwrite = False, all_or_t0 = 't0'):
     loader_test = torch.utils.data.DataLoader(
-        loader(root=opt.imagedir, trainvaltest='test', transform=False, opt=opt),
+        loader(root=opt.image_dir, trainvaltest='test', transform=False, opt=opt),
         batch_size=1, shuffle=False, num_workers=opt.num_workers)
 
     savedmodelname = os.path.join(opt.save_name)
@@ -311,7 +311,7 @@ def visualize_PaIRNet(loader, opt, n_channels, subjidname, savename, overwrite =
         
 def visualize_crosssectional_regression(loader, opt, n_channels, subjidname, savename, overwrite=False):
     loader_test = torch.utils.data.DataLoader(
-        loader(root=opt.imagedir, trainvaltest='test', transform=False, opt=opt),
+        loader(root=opt.image_dir, trainvaltest='test', transform=False, opt=opt),
         batch_size=1, shuffle=False, num_workers=opt.num_workers)
 
     savedmodelname = os.path.join(opt.save_name)

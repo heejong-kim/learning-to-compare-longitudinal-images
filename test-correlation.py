@@ -211,7 +211,7 @@ opt.image_size = image_size
 
 if __name__ == "__main__":
 
-    network = Resnet18Diff(channels=opt.n_channels)
+    network = Resnet18Diff(channels=opt.image_channel)
     savedmodelname = os.path.join(opt.save_name)
     result_delta_time, demo = test_PaIRNet(network, dict_dataloader[opt.dataname], savedmodelname, opt, opt.targetname,
                                                 dict_subjectname[opt.dataname], resultname= 'test-prediction', overwrite=False)
@@ -226,7 +226,7 @@ if __name__ == "__main__":
 
     ## --- for regression
     #
-    # network = Resnet18Regression(channels=opt.n_channels)
+    # network = Resnet18Regression(channels=opt.image_channel)
     # savedmodelname = os.path.join(opt.save_name)
     # result_reg_pred, demo = test_crosssectional_regression(network, dict_dataloader[opt.dataname], savedmodelname, opt, overwrite=False)
     #
