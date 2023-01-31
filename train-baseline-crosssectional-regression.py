@@ -265,7 +265,7 @@ if __name__ == "__main__":
     opt.save_name = f'result/{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
                         f'PaIRNet-self-supervised'
 
-    network = Resnet18Regression(channels=opt.imagechannel)
+    network = Resnet18Regression(channels=opt.image_channel)
     train(network, dict_dataloader[opt.dataname], opt)
 
     #
