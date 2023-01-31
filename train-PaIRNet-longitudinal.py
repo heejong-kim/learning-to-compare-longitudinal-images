@@ -60,6 +60,7 @@ def train(network, loader, opt, selfsupervised=True):
 
     optimizer = torch.optim.Adam(network.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
     loss_bcelogit = torch.nn.BCEWithLogitsLoss()
+    loss_mse = torch.nn.MSELoss()
     if 'scheduler' in opt:
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=5)  # factor 0.1
 
@@ -112,8 +113,10 @@ def train(network, loader, opt, selfsupervised=True):
                 targetdiff[targetdiff > 0] = 1
                 targetdiff[targetdiff == 0] = 0.5
                 targetdiff[targetdiff < 0] = 0
+                loss = loss_bcelogit(featureDiff, targetdiff)
+            else:
+                loss = loss_mse(featureDiff, targetdiff)
 
-            loss = loss_bcelogit(featureDiff, targetdiff)
             loss.backward()
             optimizer.step()
 
