@@ -63,7 +63,7 @@ def train(network, loader, opt, selfsupervised=True):
     if 'scheduler' in opt:
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=5)  # factor 0.1
 
-    steps_per_epoch = opt.num_of_iters  # 781
+    steps_per_epoch = opt.num_of_iters
     writer = SummaryWriter(log_dir="%s" % opt.save_name)
 
     prev_time = time.time()

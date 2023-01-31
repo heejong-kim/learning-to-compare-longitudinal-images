@@ -63,7 +63,7 @@ def train(network, loader, opt):
     if 'scheduler' in opt:
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=5)  # factor 0.1
 
-    steps_per_epoch = opt.num_of_iters  # 781
+    steps_per_epoch = opt.num_of_iters
     writer = SummaryWriter(log_dir="%s" % opt.save_name)
 
     prev_time = time.time()
@@ -231,7 +231,7 @@ def test_regression(network, loader, savedmodelname, opt, overwrite=False):
     return result
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--lr', default=0.001, type=float)
+parser.add_argument('--lr', default=0.01, type=float)
 parser.add_argument('--b1', default=0.9, type=float)
 parser.add_argument('--b2', default=0.999, type=float)
 parser.add_argument('--initialization', default='kaiming', type=str)
@@ -264,7 +264,7 @@ if __name__ == "__main__":
 
     # train baseline regression assuming cross-crosssectional data
     opt.save_name = f'result-model/{opt.dataname}/lr{opt.lr}-b1{opt.b1}-b2{opt.b2}{suffix}/' \
-                        f'PaIRNet-self-supervised'
+                        f'crosssectional-regression'
 
     network = Resnet18Regression(channels=opt.image_channel)
     train(network, dict_dataloader[opt.dataname], opt)

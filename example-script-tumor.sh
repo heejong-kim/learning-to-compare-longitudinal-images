@@ -2,7 +2,7 @@
 
 
 ## training: self-supervised PaIRNet
-#python ./train-PaIRNet-longitudinal.py --max_epoch=3 --num_workers=1 --image_size="200,200" --image_channel=3 --targetname='timepoint' --image_dir='./data/tumor' --dataname='tumor' --selfsupervised --num_of_iters=20
+python ./train-PaIRNet-longitudinal.py --max_epoch=3 --num_workers=1 --image_size="200,200" --image_channel=3 --targetname='timepoint' --image_dir='./data/tumor' --dataname='tumor' --selfsupervised --num_of_iters=20
 
 ## training: supervised PaIRNet
 python ./train-PaIRNet-longitudinal.py --max_epoch=3 --num_workers=1 --image_size="200,200" --image_channel=3 --targetname='timepoint' --image_dir='./data/tumor' --dataname='tumor' --no-selfsupervised --num_of_iters=20
