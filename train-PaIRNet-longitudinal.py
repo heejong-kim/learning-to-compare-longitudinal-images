@@ -68,7 +68,7 @@ def train(network, loader, opt, selfsupervised=True):
     writer = SummaryWriter(log_dir="%s" % opt.save_name)
 
     prev_time = time.time()
-    prev_val_loss = 400
+    prev_val_loss = float("inf") # TODO match the rest
     earlystoppingcount = 0
 
     loader_train = torch.utils.data.DataLoader(  #
@@ -163,6 +163,7 @@ def train(network, loader, opt, selfsupervised=True):
                     featureDiff = network(input1.type(Tensor), input2.type(Tensor))
 
                     targetdiff = ((target1 - target2)[:, None]).type(Tensor)
+                    if selfsupervised # TODO:
                     targetdiff[targetdiff > 0] = 1
                     targetdiff[targetdiff == 0] = 0.5
                     targetdiff[targetdiff < 0] = 0
