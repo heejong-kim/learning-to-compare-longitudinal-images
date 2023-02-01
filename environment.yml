@@ -28,4 +28,3 @@ dependencies:
       - torchio==0.18.73
       - grad-cam
 
-prefix: /home/hk672/miniconda3/envs/pairnet
