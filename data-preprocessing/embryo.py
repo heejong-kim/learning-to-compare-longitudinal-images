@@ -1,3 +1,12 @@
+'''
+** NOTE **
+# This script explains how the longitudinal images are selected from original embryo dataset.
+# "demo.csv" file with selected image information is provided in './data/embryo/'.
+
+## paper: https://www.sciencedirect.com/science/article/pii/S2352340922004607#tbl0001
+## dataset: https://zenodo.org/record/6390798#.Y09KKx7MLnE
+'''
+
 import os
 import pandas as pd
 import numpy as np
@@ -5,11 +14,6 @@ import torchvision.transforms as transforms
 from PIL import Image
 from torchvision.transforms.functional import InterpolationMode
 
-# create demo for embryo dataset
-## paper: https://www.sciencedirect.com/science/article/pii/S2352340922004607#tbl0001
-## dataset: https://zenodo.org/record/6390798#.Y09KKx7MLnE
-
-# TODO revisit and write guide for preprocessing
 
 import glob
 dir_annotation = '../data/embryo/embryo_dataset_annotations'

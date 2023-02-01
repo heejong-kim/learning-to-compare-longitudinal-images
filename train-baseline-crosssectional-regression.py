@@ -60,23 +60,23 @@ def train(network, loader, opt):
 
     optimizer = torch.optim.Adam(network.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
     loss_mse = torch.nn.MSELoss()
-    if 'scheduler' in opt:
+    if opt.scheduler:
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=5)  # factor 0.1
 
     steps_per_epoch = opt.num_of_iters
     writer = SummaryWriter(log_dir="%s" % opt.save_name)
 
     prev_time = time.time()
-    prev_val_loss = 400
+    prev_val_loss = float("inf")
     earlystoppingcount = 0
 
     loader_train = torch.utils.data.DataLoader(  #
         loader(root=opt.image_dir, trainvaltest='train', transform=True, opt=opt),
-        batch_size=64, shuffle=True, num_workers=opt.num_workers, drop_last=True)
+        batch_size=opt.batchsize, shuffle=True, num_workers=opt.num_workers, drop_last=True)
 
     loader_val = torch.utils.data.DataLoader(
         loader(root=opt.image_dir, trainvaltest='val', transform=False, opt=opt),
-        batch_size=64, shuffle=True, num_workers=opt.num_workers, drop_last=True)
+        batch_size=opt.batchsize, shuffle=True, num_workers=opt.num_workers, drop_last=True)
 
     for epoch in range(opt.epoch, opt.max_epoch):
 
@@ -154,7 +154,7 @@ def train(network, loader, opt):
                 print(' - '.join((epoch_info, time_info, loss_info, val_loss_info)), flush=True)
                 network.train()
                 curr_val_loss = np.mean(valloss_total)
-                if 'scheduler' in opt:
+                if opt.scheduler:
                     scheduler.step(curr_val_loss)
                 if prev_val_loss > curr_val_loss:
                     torch.save(network.state_dict(),
@@ -202,7 +202,7 @@ def test_regression(network, loader, savedmodelname, opt, overwrite=False):
 
         loader_test = torch.utils.data.DataLoader(
             loader(root=opt.image_dir, trainvaltest='test', transform=False, opt=opt),
-            batch_size=64, shuffle=True, num_workers=opt.num_workers)
+            batch_size=opt.batchsize, shuffle=True, num_workers=opt.num_workers)
 
         tmp_stack_output = np.empty((0, 1))
         tmp_stack_target = np.empty((0, 1))
@@ -236,6 +236,8 @@ parser.add_argument('--b1', default=0.9, type=float)
 parser.add_argument('--b2', default=0.999, type=float)
 parser.add_argument('--initialization', default='kaiming', type=str)
 parser.add_argument('--seed', default=0, type=int)
+parser.add_argument('--batchsize', default=64, type=int)
+parser.add_argument('--scheduler', action='store_true', help="if specified, scheduler will be used")
 
 parser.add_argument('--max_epoch', default=200, type=int, help="Max epoch")
 parser.add_argument('--max_iters', default=10000000000, type=int, help="Max iteration")

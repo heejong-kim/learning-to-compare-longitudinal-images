@@ -41,7 +41,6 @@ class Resnet18Regression(nn.Module):
         return x
 
 class Resnet18DiffForPairVisFeature(nn.Module):
-    # TODO: rename and reflect to testing script
     def __init__(self, channels=3):
         super(Resnet18DiffForPairVisFeature, self).__init__()
 

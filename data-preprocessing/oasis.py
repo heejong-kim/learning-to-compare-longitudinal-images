@@ -1,3 +1,12 @@
+'''
+** NOTE **
+# preprocessed slice OASIS images can be found here: https://drive.google.com/file/d/1FDW8t0DoaQ2xvqul9sXU2BbqOvHr_Zod/view?usp=share_link
+
+# OASIS3 original dataset can be downloaded from here: https://www.oasis-brains.org/#data.
+# This script explains how the OASIS3 dataset is preprocessed.
+# The process includes: 1) download images 2) image registration (affine) 3) create demo file (demo-healthy-longitudinal.csv).
+'''
+
 import pandas as pd
 import numpy as np
 import os
@@ -48,14 +57,12 @@ def run_bash_parallel(i):
     scriptname = '/home/hk672/oasis-data/download_scans/download_oasis_scans_bids.sh'
     inputfile = os.path.join(demodir, f'oasis3-mr-list{i}.csv')
     savedir = '/nfs04/data/OASIS3/image'
-    username = 'heejong'
     scantype = 'T1w'
     os.system(f'{scriptname} {inputfile} {savedir} {scantype}')
     return i
 
 from joblib import Parallel, delayed
 out = Parallel(n_jobs=num_cores)(delayed(run_bash_parallel)(i) for i in range(batch + 1))
-
 
 # how many do we have
 all_nifti_names = glob.glob('/nfs04/data/OASIS3/image/sub-*/*/*/*.nii.gz')
@@ -121,7 +128,7 @@ demoHClong = demoHCone[demoHCone['subject-id'].isin(HClongsubjects)].reset_index
 
 demoHClong.to_csv('/nfs04/data/OASIS3/demo/demo-healthy-longitudinal.csv')
 
-np.savetxt('/nfs04/data/OASIS3/rigid-alignment/imagelist.csv', np.array(demoHClong.fname), '%s')
+np.savetxt('/nfs04/data/OASIS3/affine-alignment/imagelist.csv', np.array(demoHClong.fname), '%s')
 
 # train/val/test
 demoHClong = pd.read_csv('/nfs04/data/OASIS3/demo/demo-healthy-longitudinal.csv')
@@ -150,25 +157,8 @@ set(demoHClong['subject-id'][demoHClong['trainvaltest'] == 'val'])\
 
 # Rigid atlas building
 ANTSPATH = '/home/hk672/ANTs/bin/ANTS-build/Examples/'
-outputPath = '/nfs04/data/OASIS3/rigid-alignment/'
 outputPath = '/nfs04/data/OASIS3/affine-alignment/'
-inputPathcsv = '/nfs04/data/OASIS3/rigid-alignment/imagelist.csv'
-rigid_atlas_cmd = f'{ANTSPATH}/antsMultivariateTemplateConstruction2.sh \
-              -d 3 \
-              -o {outputPath}T_ \
-              -i 1 \
-              -g 0.25 \
-              -j 4 \
-              -k 1 \
-              -v 10 \
-              -c 2 \
-              -q 100x100x70x20 \
-              -n 0 \
-              -r 0 \
-              -m MI \
-              -l 1 \
-              -t Rigid \
-              {inputPathcsv}'
+inputPathcsv = '/nfs04/data/OASIS3/affine-alignment/imagelist.csv'
 
 affine_atlas_cmd = f'{ANTSPATH}/antsMultivariateTemplateConstruction2.sh \
               -d 3 \
@@ -187,16 +177,13 @@ affine_atlas_cmd = f'{ANTSPATH}/antsMultivariateTemplateConstruction2.sh \
               -t Affine \
               {inputPathcsv}'
 
-# and apply CC later
 
 # get mid save png
 sliceidx = 144
-# outdir = '/nfs04/data/OASIS3/rigid-aligned-midslice/images' # rename if needed /nfs04/data/OASIS3/aligned-midslice/images
 outdir = '/nfs04/data/OASIS3/affine-aligned-midslice/images'
 
 for i in range(len(demoHClong)):
     partialname = demoHClong.fname.iloc[i].split('/')[-1].split('.nii.gz')[0]
-    # fnames = glob.glob('/nfs04/data/OASIS3/rigid-alignment/T_template0'+partialname+'*.nii.gz')
     fnames = glob.glob('/nfs04/data/OASIS3/affine-alignment/T_template0'+partialname+'*.nii.gz')
     assert len(fnames) == 1
     image = np.asanyarray(nib.load(fnames[0]).dataobj)[:, ::-1, 144].T
@@ -204,14 +191,6 @@ for i in range(len(demoHClong)):
     image2d = Image.fromarray(imagerescaled)
     fname2d = demoHClong['subject-id'].iloc[i] + '_' + demoHClong['session-id'].iloc[i]
     image2d.save(os.path.join(outdir, f'{fname2d}.png'))
-
-    # plt.imshow(image[:, ::-1, 144].T)
-    # plt.gray()
-    # fname2d = demoHClong['subject-id'].iloc[i] + '_' + demoHClong['session-id'].iloc[i]
-    # plt.savefig(os.path.join(outdir, f'{fname2d}.png'))
-    # plt.close()
-    # plt.clf()
-
 
 demoHClong_slice = pd.read_csv('/nfs04/data/OASIS3/demo/demo-healthy-longitudinal.csv', index_col=[0])
 demoHClong_slice.fname = outdir + demoHClong['subject-id'] + '_' + demoHClong['session-id'] + '.png'
@@ -249,7 +228,6 @@ demoHClong['timepoint'] = timepoint.astype('int')
 demoHClong.to_csv('/nfs04/data/OASIS3/demo/demo-healthy-longitudinal.csv')
 demoHClong_slice.to_csv(f'{outdir}/demo-healthy-longitudinal.csv')
 
-# demoHClong_slice.fname = demoHClong_slice.fname.str.replace('/nfs04/data/OASIS3/aligned-midslice/', '')
 demoHClong_slice.fname = 'images/' + demoHClong['subject-id'] + '_' + demoHClong['session-id'] + '.png'
 demoHClong_slice.to_csv(f'{outdir}/demo-healthy-longitudinal.csv')
 
