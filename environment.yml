@@ -20,6 +20,7 @@ dependencies:
   - scipy=1.7.1=py39h292c36d_2
   - tensorboard=2.11.0=pyhd8ed1ab_0
   - torchvision=0.11.2=py39_cu113
+  - torchio
   - pip
   - pip:
       - opencv-python==4.5.5.62

@@ -7,6 +7,8 @@ import cv2
 import torchvision.transforms as transforms
 from torchvision.transforms.functional import InterpolationMode
 import torch
+import torchio as tio
+import nibabel as nib
 
 class STARMEN(Dataset):
     def __init__(self, root='./data/starmen', transform=None, trainvaltest='train', opt = None):
@@ -434,3 +436,86 @@ class EMBRYOregression(Dataset):
     def __len__(self):
         return len(self.demo)
     
+class OASIS3D(Dataset):
+    def __init__(self, root='/share/sablab/nfs04/data/OASIS3/', transform=None, trainvaltest='train', opt = None):
+
+        self.trainvaltest = trainvaltest
+        self.imgdir = os.path.join(root, 'image/')
+        self.targetname = opt.targetname
+
+        if 'demoname' in opt:
+            meta = pd.read_csv(os.path.join(root, opt.demoname), index_col=0)
+        else:
+            meta = pd.read_csv(os.path.join(root, 'demo/demo-healthy-longitudinal-3D.csv'), index_col=0)
+
+        # fname = np.loadtxt('/share/sablab/nfs04/data/OASIS3/affine-alignment/imagelist.csv', 'str')
+        # meta.fname = fname
+        # # matching name test
+        # fname = meta.fname.str.split('/', expand=True)[8]
+        # fnametmp = fname.str.split('_', expand=True)
+        # np.all(fnametmp[1] == meta['session-id'])
+        # meta.to_csv(os.path.join(root, 'demo/demo-healthy-longitudinal-3D.csv'))
+
+        meta = meta[meta.trainvaltest == trainvaltest].reset_index()
+        IDunq = np.unique(meta['subject-id'])
+        index_combination = np.empty((0, 2))
+        for sid in IDunq:
+            indices = np.where(meta['subject-id'] == sid)[0]
+            ### all possible pairs
+            tmp_combination = np.array(
+                np.meshgrid(np.array(range(len(indices))), np.array(range(len(indices))))).T.reshape(-1, 2)
+            index_combination = np.append(index_combination, indices[tmp_combination], 0)
+
+        if transform:
+            transforms = []
+            affine = tio.RandomAffine(scales=0.1,
+                                         degrees=10,
+                                         translation=5,
+                                         image_interpolation='linear',
+                                         default_pad_value='otsu')  # bspline
+            transforms.append(affine)
+            intensity = tio.OneOf({
+                # tio.RandomBiasField(): 0.5,
+                tio.RandomNoise(): 0.5,
+                tio.RandomBlur(): 0.5
+            },
+                p=0.5,
+            )
+            transforms.append(intensity)
+            self.transform = tio.Compose(transforms)
+        else:
+            self.transform=False
+
+        self.index_combination = index_combination
+        self.demo = meta
+        self.image_size = opt.image_size
+
+    def __getitem__(self, index):
+        index1, index2 = self.index_combination[index]
+        target1, target2 = self.demo[self.targetname][index1], self.demo[self.targetname][index2]
+
+        image1 = tio.Subject(
+            t1=tio.ScalarImage(os.path.join(self.imgdir, self.demo.fname[index1])),
+            label=[],
+            diagnosis='',
+        )
+        image2 = tio.Subject(
+            t1=tio.ScalarImage(os.path.join(self.imgdir, self.demo.fname[index2])),
+            label=[],
+            diagnosis='',
+        )
+
+        if image1.shape[1:] != tuple(self.image_size):
+            resize = tio.transforms.Resize(tuple(self.image_size))
+            image1 = resize(image1)
+            image2 = resize(image2)
+
+        if self.transform:
+            image1 = self.transform(image1)
+            image2 = self.transform(image2)
+
+
+        return [np.array(image1)[0], target1], [np.array(image2)[0], target2]
+
+    def __len__(self):
+        return len(self.index_combination)

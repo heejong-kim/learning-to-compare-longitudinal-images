@@ -1,6 +1,34 @@
 import copy
 import torch.nn as nn
-from torchvision.models import resnet18
+from torchvision.models import resnet18, video
+
+
+class Resnet18Diff3D(nn.Module):
+    def __init__(self, channels=3):
+        super(Resnet18Diff3D, self).__init__()
+        resnet = video.r3d_18()
+        # Originally r3d_18 is for video. initial kernel size as follows:
+        # (stem): BasicStem(
+        #     (0): Conv3d(3, 64, kernel_size=(3, 7, 7), stride=(1, 2, 2), padding=(1, 3, 3), bias=False)
+        # (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        # (2): ReLU(inplace=True)
+        # )
+        # updated as follows:
+        resnet.stem[0] = nn.Conv3d(channels, 64, 7, 2, 3, bias=False)
+
+        resnet.fc = nn.Identity()
+        self.features = resnet
+        fc = []
+        fc.append(nn.Linear(512, 1, bias=False))
+        self.classifier = nn.Sequential(*fc)
+
+    def forward(self, x1, x2):
+        x1 = self.features(x1)
+        x2 = self.features(x2)
+        x = x1 - x2
+        x = self.classifier(x)
+        return x
+
 
 class Resnet18Diff(nn.Module):
     def __init__(self, channels=3):
