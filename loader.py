@@ -519,3 +519,73 @@ class OASIS3D(Dataset):
 
     def __len__(self):
         return len(self.index_combination)
+
+class ADNI3D(Dataset):
+    def __init__(self, root='/sablab/share/nfs04/data/ADNI_01_21_2023/', transform=None, trainvaltest='train', opt = None):
+        self.trainvaltest = trainvaltest
+        self.imgdir = ''
+        self.targetname = opt.targetname
+        # Read meta.
+        meta = pd.read_csv(root+'ADNIMERGE_HealthyAging.csv', low_memory=False)
+        # Get the split.
+        meta = meta[meta.trainvaltest == trainvaltest].reset_index()
+        # Get the index combinations.
+        IDunq = np.unique(meta['RID'])
+        index_combination = np.empty((0, 2))
+        for sid in IDunq:
+            indices = np.where(meta['RID'] == sid)[0]
+            ### all possible pairs
+            tmp_combination = np.array(
+                np.meshgrid(np.array(range(len(indices))), np.array(range(len(indices))))).T.reshape(-1, 2)
+            index_combination = np.append(index_combination, indices[tmp_combination], 0)
+        # Apply the transorms.
+        if transform:
+            transforms = []
+            affine = tio.RandomAffine(scales=0.1,
+                                        degrees=10,
+                                        translation=5,
+                                        image_interpolation='linear',
+                                        default_pad_value='otsu')  # bspline
+            transforms.append(affine)
+            intensity = tio.OneOf({
+                # tio.RandomBiasField(): 0.5,
+                tio.RandomNoise(): 0.5,
+                tio.RandomBlur(): 0.5
+            },
+                p=0.5,
+            )
+            transforms.append(intensity)
+            self.transform = tio.Compose(transforms)
+        else:
+            self.transform=False
+        # Save.
+        self.index_combination = index_combination
+        self.demo = meta
+        self.image_size = opt.image_size
+        #
+
+    def __getitem__(self, index):
+            index1, index2 = self.index_combination[index]
+            target1, target2 = self.demo[self.targetname][index1], self.demo[self.targetname][index2]
+            image1 = tio.Subject(
+                t1=tio.ScalarImage(os.path.join(self.imgdir, self.demo.MRI_path[index1])),
+                label=[],
+                diagnosis='',
+            )
+            image2 = tio.Subject(
+                t1=tio.ScalarImage(os.path.join(self.imgdir, self.demo.MRI_path[index2])),
+                label=[],
+                diagnosis='',
+            )
+            if image1.shape[1:] != tuple(self.image_size):
+                resize = tio.transforms.Resize(tuple(self.image_size))
+                image1 = resize(image1)
+                image2 = resize(image2)
+            if self.transform:
+                image1 = self.transform(image1)
+                image2 = self.transform(image2)
+            return [np.array(image1)[0], target1], [np.array(image2)[0], target2]
+
+    def __len__(self):
+        return len(self.index_combination)
+
