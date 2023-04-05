@@ -1,9 +1,11 @@
 # Learning to compare longitudinal images
-Implementation of the paper "Learning to compare longitudinal images" of Heejong Kim and Mert Sabuncu, to appear in MIDL 2023.
+Implementation of the paper "Learning to compare longitudinal images" of Heejong Kim and Mert Sabuncu, to appear in MIDL 2023 (Oral).
 
-[comment]: <> ([Project Page]&#40;https://heejongkim.com/dwi-synthesis&#41; | [Paper]&#40;https://arxiv.org/abs/2106.13188&#41; )
+[Project Page](https://heejongkim.com/pairnet-midl) | [Paper](https://openreview.net/forum?id=l17YFzXLP53)
 
-![Pairwise Image Ranking Network (PaIRNet)](figure-architecture.png)
+[comment]: <> (![Pairwise Image Ranking Network &#40;PaIRNet&#41;]&#40;figure-architecture.png&#41;)
+![Example result of synthetic tumor](video-example.gif)
+
 
 [comment]: <> (TODO: update figure to a video of tumor size detection)
 
