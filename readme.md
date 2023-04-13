@@ -33,4 +33,5 @@ author={Heejong Kim and Mert R. Sabuncu},
 booktitle={Medical Imaging with Deep Learning},
 year={2023},
 url={https://openreview.net/forum?id=l17YFzXLP53}
-}```
+}
+```
